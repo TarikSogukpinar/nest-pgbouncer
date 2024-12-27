@@ -1,0 +1,43 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: auth_db
+    networks:
+      - app_network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  pgbouncer:
+    image: bitnami/pgbouncer:latest
+    container_name: pgbouncer
+    restart: always
+    environment:
+      - PGBOUNCER_USER=user
+      - PGBOUNCER_PASSWORD=password
+      - PGBOUNCER_DATABASE=auth_db
+      - PGBOUNCER_AUTH_TYPE=md5
+      - POSTGRESQL_HOST=postgres # Bu kısmın "postgres" olduğundan emin olun
+      - PGBOUNCER_POOL_MODE=session
+      - POSTGRESQL_PASSWORD=password
+    networks:
+      - app_network
+    volumes:
+      - ./pgbouncer/:/bitnami/pgbouncer/conf/
+    depends_on:
+      - postgres
+    ports:
+      - "6432:6432"
+
+volumes:
+  postgres_data:
+
+networks:
+  app_network:
+    driver: bridge
