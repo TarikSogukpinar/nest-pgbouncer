@@ -23,7 +23,7 @@ services:
       - PGBOUNCER_PASSWORD=password
       - PGBOUNCER_DATABASE=auth_db
       - PGBOUNCER_AUTH_TYPE=md5
-      - POSTGRESQL_HOST=postgres # Bu kısmın "postgres" olduğundan emin olun
+      - POSTGRESQL_HOST=postgres 
       - PGBOUNCER_POOL_MODE=session
       - POSTGRESQL_PASSWORD=password
     networks:
