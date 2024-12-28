@@ -25,12 +25,11 @@ import { JwtAuthGuard } from './guards/auth.guard';
 import { CustomRequest } from '../core/request/customRequest';
 import { RegisterUserDto } from './dto/registerUser.dto';
 import { LogoutDto } from './dto/logout.dto';
-import { ErrorCodes } from 'src/core/handler/error/error-codes';
-import { AuthGuard } from '@nestjs/passport';
 import { LogoutResponseDto } from './dto/logoutResponse.dto';
 import { ConfigService } from '@nestjs/config';
 import { TokenService } from 'src/core/token/token.service';
 import { Request } from 'express';
+import { ErrorCodes } from 'src/core/handler/error/error-code';
 
 @Controller({ path: 'auth', version: '1' })
 @ApiTags('Auth')

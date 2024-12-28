@@ -12,8 +12,14 @@ export class InvalidCredentialsException extends HttpException {
     }
 }
 
-export class PassportCannotBeTheSameException extends HttpException {
+export class EmailNotFoundException extends HttpException {
     constructor() {
-        super('Passport cannot be the same', HttpStatus.BAD_REQUEST);
+        super("Email doesn't exist", HttpStatus.NOT_FOUND);
+    }
+}
+
+export class UserAlreadyExistsException extends HttpException {
+    constructor() {
+        super('User already exists', HttpStatus.CONFLICT);
     }
 }

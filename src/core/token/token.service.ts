@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 import { PrismaService } from '../../database/database.service';
-import { ErrorCodes } from '../handler/error/error-codes';
+import { ErrorCodes } from '../handler/error/error-code';
 
 @Injectable()
 export class TokenService {

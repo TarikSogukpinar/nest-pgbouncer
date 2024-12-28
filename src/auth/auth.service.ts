@@ -2,20 +2,15 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../database/database.service';
 import { TokenService } from '../core/token/token.service';
 import { RegisterResponseDto } from './dto/registerResponse.dto';
-import { User } from '@prisma/client';
 import { LoginUserDto } from './dto/loginUser.dto';
 import { RegisterUserDto } from './dto/registerUser.dto';
 import { LoginResponseDto } from './dto/loginResponse.dto';
 import { JwtService } from '@nestjs/jwt';
 import { LogoutResponseDto } from './dto/logoutResponse.dto';
 import { Request } from 'express';
-import {
-    EmailNotFoundException,
-    InvalidCredentialsException,
-    UserAlreadyExistsException,
-    UserNotFoundException,
-} from 'src/core/handler/exceptions/custom-expection';
 import { HashingService } from 'src/utils/hashing/hashing.service';
+import { InvalidCredentialsException, UserAlreadyExistsException, UserNotFoundException } from 'src/core/handler/exceptions/custom-exception';
+import { Role } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -45,7 +40,7 @@ export class AuthService {
                     name: name,
                     email: email,
                     password: hashedPassword,
-                    role: 'USER',
+                    role: Role.USER,
                 },
             });
 
@@ -106,13 +101,13 @@ export class AuthService {
     ): Promise<LogoutResponseDto> {
         try {
             const user = await this.prismaService.user.findUnique({
-                where: { id: userId },
+                where: { id: userId.toString() },
             });
 
             if (!user) throw new UserNotFoundException();
 
             await this.prismaService.user.update({
-                where: { id: userId },
+                where: { id: userId.toString() },
                 data: { accessToken: null, refreshToken: null },
             });
 
@@ -141,55 +136,4 @@ export class AuthService {
         }
     }
 
-    async validateOAuthLoginEmail(
-        email: string,
-        provider: string,
-    ): Promise<User> {
-        try {
-            let user = await this.prismaService.user.findUnique({
-                where: { email },
-            });
-
-            if (!user) {
-                user = await this.prismaService.user.create({
-                    data: {
-                        email,
-                        password: '',
-                        role: 'USER',
-                    },
-                });
-            }
-
-            return user;
-        } catch (error) {
-            console.log(error);
-            throw new InternalServerErrorException(
-                'An error occurred, please try again later',
-            );
-        }
-    }
-
-    async validateOAuthLogin(profile: {
-        email: string;
-        provider: string;
-    }): Promise<string> {
-        try {
-            const { email, provider } = profile;
-
-            if (!email) throw new EmailNotFoundException();
-
-            const user = await this.validateOAuthLoginEmail(email, provider);
-
-            const payload = { email: user.email, sub: user.id, role: user.role };
-            return this.jwtService.sign(payload, {
-                secret: process.env.JWT_SECRET,
-                expiresIn: process.env.JWT_EXPIRES_IN,
-            });
-        } catch (error) {
-            console.log(error);
-            throw new InternalServerErrorException(
-                'An error occurred, please try again later',
-            );
-        }
-    }
 }
